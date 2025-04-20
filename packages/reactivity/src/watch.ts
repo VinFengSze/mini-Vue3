@@ -15,6 +15,27 @@ function traverse(source, s = new Set()) {
   return source;
 }
 export function watch(source, cb, options) {
+  // let getter;
+  // if (isReactive(source)) {
+  //   getter = () => traverse(source); // 只有访问属性，才能依赖收集
+  // } else if (isFunction(source)) {
+  //   getter = source;
+  // }
+  // let oldValue;
+  // const job = () => {
+  //   const newVal = effect.run(); //再次调用effect 拿到新的值
+  //   cb(newVal, oldValue);
+  //   oldValue = newVal;
+  // };
+  // const effect = new ReactiveEffect(getter, job);
+  // if (options.immediate) {
+  //   job();
+  //   return;
+  // }
+  // oldValue = effect.run(); // 保留老值
+  doWatch(source, cb, options);
+}
+export function doWatch(source, cb, options) {
   let getter;
   if (isReactive(source)) {
     getter = () => traverse(source); // 只有访问属性，才能依赖收集
@@ -23,15 +44,22 @@ export function watch(source, cb, options) {
   }
   let oldValue;
   const job = () => {
-    const newVal = effect.run(); //再次调用effect 拿到新的值
-    cb(newVal, oldValue);
-    oldValue = newVal;
+    if (cb) {
+      const newVal = effect.run(); //再次调用effect 拿到新的值
+      cb(newVal, oldValue);
+      oldValue = newVal;
+    } else {
+      effect.run();
+    }
   };
   const effect = new ReactiveEffect(getter, job);
-  if (options.immediate) {
+  if (options?.immediate) {
     job();
     return;
   }
   oldValue = effect.run(); // 保留老值
-  // return effect;
+}
+
+export function watchEffect(effect, options) {
+  doWatch(effect, null, options);
 }

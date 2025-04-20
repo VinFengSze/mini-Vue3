@@ -25,7 +25,6 @@ class CoputedRefImpl {
     if (activeEffect) {
       // 如果有activeEffect 是在effect中使用
       trackEffect(this.deps || (this.deps = new Set()));
-      console.log(this.deps);
     }
     // 取值才执行，并把取到的值缓存起来
     if (this._dirty) {
@@ -36,7 +35,6 @@ class CoputedRefImpl {
   }
   set value(newValue) {
     this.setter(newValue);
-    console.log(this.deps);
   }
 }
 export function computed(getterOrOprions) {
