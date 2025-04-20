@@ -42,11 +42,17 @@ export function doWatch(source, cb, options) {
   } else if (isFunction(source)) {
     getter = source;
   }
+  let cleanup;
+  const onCleanUp = (userCb) => {
+    cleanup = userCb;
+  };
   let oldValue;
   const job = () => {
     if (cb) {
       const newVal = effect.run(); //再次调用effect 拿到新的值
-      cb(newVal, oldValue);
+      // 下一次 闭包环境下，将flag设置为了flase，也就是下一次请求，将上一次请求抛弃了
+      if (cleanup) cleanup();
+      cb(newVal, oldValue, onCleanUp);
       oldValue = newVal;
     } else {
       effect.run();
