@@ -1,5 +1,5 @@
 export let activeEffect = null;
-class reactiveEffect {
+export class ReactiveEffect {
   public active: boolean = true;
   public deps: Array<any> = [];
   public parent: any = null;
@@ -26,7 +26,7 @@ class reactiveEffect {
   }
 }
 export const effect = (fn, options = { scheduler: null }) => {
-  const _effect = new reactiveEffect(fn, options.scheduler);
+  const _effect = new ReactiveEffect(fn, options.scheduler);
 
   _effect.run();
   const runner = _effect.fn.bind(_effect);
@@ -46,6 +46,9 @@ export function track(target, key) {
   if (!deps) {
     depMaps.set(key, (deps = new Set()));
   }
+  trackEffect(deps);
+}
+export function trackEffect(deps) {
   const isShouldAddEffect = deps.has(activeEffect);
   if (!isShouldAddEffect) {
     deps.add(activeEffect);
@@ -57,6 +60,9 @@ export function trigger(target, key, newValue, oldValue) {
   const depMaps = targetMap.get(target);
   if (!depMaps) return;
   const deps = depMaps.get(key);
+  trggerEffect(deps);
+}
+export function trggerEffect(deps) {
   if (!deps) return;
   const effects = [...deps]; // 防止死循环
   effects.forEach((effect) => {
