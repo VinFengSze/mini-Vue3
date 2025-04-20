@@ -1,5 +1,5 @@
 import { ReactiveFlags, reactive } from "./reactive";
-import { activeEffect, track, trigger } from "./effect";
+import { track, trigger } from "./effect";
 import { isObject } from "@vue/shared";
 export const mutableHandlers = {
   get(target, key, receiver) {
