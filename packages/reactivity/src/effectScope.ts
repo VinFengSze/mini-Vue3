@@ -3,7 +3,12 @@ class EffectScope {
   active = true;
   effects = [];
   parent;
-  constructor() {}
+  scopes;
+  constructor(detached = false) {
+    if (!detached && activeEffectScope) {
+      activeEffectScope.scope || (activeEffectScope.scopes = []).push(this);
+    }
+  }
   run(fn) {
     if (this.active) {
       try {
@@ -21,12 +26,17 @@ class EffectScope {
       for (let i = 0; i < this.effects.length; i++) {
         this.effects[i].stop();
       }
-      this.active = false;
     }
+    if (this.scopes) {
+      for (let i = 0; i < this.scopes.length; i++) {
+        this.scopes[i].stop();
+      }
+    }
+    this.active = false;
   }
 }
-export function effectScope() {
-  return new EffectScope();
+export function effectScope(detached) {
+  return new EffectScope(this.detached);
 }
 
 export function recordEffectScope(effect) {
