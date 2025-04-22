@@ -1,9 +1,13 @@
+import { recordEffectScope } from "./effectScope";
+
 export let activeEffect = null;
 export class ReactiveEffect {
   public active: boolean = true;
   public deps: Array<any> = [];
   public parent: any = null;
-  constructor(public fn, private scheduler) {}
+  constructor(public fn, private scheduler) {
+    recordEffectScope(this);
+  }
   run() {
     if (!this.active) {
       return this.fn();
